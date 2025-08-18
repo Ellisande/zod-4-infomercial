@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "hono": "^4.9.2",
+    "uuid": "^11.1.0",
     "zod": "^4.0.17"
   },
   "devDependencies": {
