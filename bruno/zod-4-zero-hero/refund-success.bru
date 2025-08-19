@@ -1,0 +1,24 @@
+meta {
+  name: refund-success
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3000/refund
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "originalOrderId": "123",
+    "requestedRefundAmount": 1234,
+    "refundReason": "It broke on day 1",
+    "refundType": "store_credit"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "zod-4-zero-hero",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
