@@ -74,16 +74,8 @@ app.post("/refund", redactMiddleware(RefundOutputSchema), async (c) => {
   }
   const parsedInput = inputResult.data;
 
-  // Destructuring
-  const { originalOrderId, requestedRefundAmount, refundReason } = parsedInput;
-
   // Business logic
-  const refundId = v7();
-
-  const refund = await saveRefund({
-    refundId,
-    refundAmount: requestedRefundAmount,
-  });
+  const refund = await processRefund(parsedInput);
 
   // Output
   const output = RefundOutputSchema.parse(refund);
@@ -96,5 +88,17 @@ app.post("/refund", redactMiddleware(RefundOutputSchema), async (c) => {
     paidTo,
   });
 });
+
+const processRefund = async (
+  input: z.infer<typeof RefundInputSchema>
+): Promise<z.infer<typeof RefundOutputSchema>> => {
+  const { requestedRefundAmount } = input;
+  const refundId = v7();
+  const refund = await saveRefund({
+    refundId,
+    refundAmount: requestedRefundAmount,
+  });
+  return refund;
+};
 
 export default app;
