@@ -1,0 +1,28 @@
+meta {
+  name: refund-success-paid-to
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:3000/refund
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "originalOrderId": "0198bfab-a1ad-7688-9e5b-0957b30b4102",
+    "requestedRefundAmount": {
+      "currency": "USD",
+      "precision": "micros",
+      "value": 1000000
+    },
+    "refundReason": "It broke on day 1 and I'm going to sue your asses",
+    "refundType": "bank_transfer"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
