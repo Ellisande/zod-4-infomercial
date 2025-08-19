@@ -1,3 +1,6 @@
+import z from "zod";
+import { AmountSchema } from "./schemas";
+
 export const getOrder = async (orderId: string) => {
   return {
     id: orderId,
@@ -18,7 +21,7 @@ export const saveRefund = async ({
   refundAmount,
 }: {
   refundId: string;
-  refundAmount: number;
+  refundAmount: z.infer<typeof AmountSchema>;
 }) => {
   return {
     refundId,

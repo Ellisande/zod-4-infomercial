@@ -1,31 +1,26 @@
 import { Hono } from "hono";
 import { v7 } from "uuid";
-import { saveRefund } from "./mockDb";
 import { z } from "zod";
+import { saveRefund } from "./mockDb";
+import {
+  AmountOutputSchema,
+  CompatibleAmountSchema,
+  ThreateningToSueSchema,
+  UuidSchema,
+} from "./schemas";
 
 const app = new Hono();
 
-const UuidSchema = z
-  .string()
-  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-
-const ThreateningToSueSchema = z
-  .string()
-  .max(255)
-  .refine((value) => /(lawsuit|sue|lawyer)/gi.test(value), {
-    message: "Does not constitute a valid refund reason, refund denied",
-  });
-
 const RefundInputSchema = z.object({
   originalOrderId: UuidSchema.optional(),
-  requestedRefundAmount: z.number().min(0),
+  requestedRefundAmount: CompatibleAmountSchema,
   refundReason: ThreateningToSueSchema,
   refundType: z.literal("store_credit"),
 });
 
 const RefundOutputSchema = z.object({
   refundId: z.string(),
-  refundAmount: z.number(),
+  refundAmount: AmountOutputSchema,
 });
 
 app.post("/refund", async (c) => {
