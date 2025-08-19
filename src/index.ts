@@ -20,7 +20,11 @@ const RefundOutputSchema = z.object({
 app.post("/refund", async (c) => {
   // Input validation
   const input = await c.req.json();
-  const parsedInput = RefundInputSchema.parse(input);
+  const inputResult = RefundInputSchema.safeParse(input);
+  if (!inputResult.success) {
+    return c.json(inputResult.error.issues, 400);
+  }
+  const parsedInput = inputResult.data;
 
   // Destructuring
   const { originalOrderId, requestedRefundAmount } = parsedInput;
