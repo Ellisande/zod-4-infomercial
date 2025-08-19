@@ -36,3 +36,23 @@ export const CompatibleAmountSchema = z.union([
 export const AmountOutputSchema = AmountSchema.extend({
   value: z.bigint().transform((value) => Number(value)),
 });
+
+type MaskData = {
+  type: "mask";
+  transform: (value: z.$output) => string;
+};
+
+export const RedactedRegistry = z.registry<MaskData>();
+
+export const BankAccountSchema = z.object({
+  accountNumber: z.number(),
+  routingNumber: z.number(),
+  nameOnAccount: z.string(),
+});
+
+RedactedRegistry.add(BankAccountSchema, {
+  type: "mask",
+  transform: (value) => {
+    return "Bank account ending in " + value.accountNumber.toString().slice(-4);
+  },
+});
