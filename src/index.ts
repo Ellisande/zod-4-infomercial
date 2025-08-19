@@ -1,28 +1,29 @@
 import { Hono } from "hono";
 import { v7 } from "uuid";
 import { saveRefund } from "./mockDb";
+import { z } from "zod";
 
 const app = new Hono();
 
-type RefundInput = {
-  originalOrderId: string;
-  requestedRefundAmount: number;
-  refundReason: string;
-  refundType: "store_credit";
-};
+const RefundInputSchema = z.object({
+  originalOrderId: z.string(),
+  requestedRefundAmount: z.number(),
+  refundReason: z.string(),
+  refundType: z.enum(["store_credit"]),
+});
 
-type RefundOutput = {
-  refundId: string;
-  refundAmount: number;
-};
+const RefundOutputSchema = z.object({
+  refundId: z.string(),
+  refundAmount: z.number(),
+});
 
 app.post("/refund", async (c) => {
   // Input validation
   const input = await c.req.json();
-  const parsed: RefundInput = input;
+  const parsedInput = RefundInputSchema.parse(input);
 
   // Destructuring
-  const { originalOrderId, requestedRefundAmount } = parsed;
+  const { originalOrderId, requestedRefundAmount } = parsedInput;
 
   // Business logic
   const refundId = v7();
@@ -33,7 +34,8 @@ app.post("/refund", async (c) => {
   });
 
   // Output
-  return c.json(refund);
+  const output = RefundOutputSchema.parse(refund);
+  return c.json(output);
 });
 
 export default app;
