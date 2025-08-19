@@ -5,11 +5,22 @@ import { z } from "zod";
 
 const app = new Hono();
 
+const UuidSchema = z
+  .string()
+  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+
+const ThreateningToSueSchema = z
+  .string()
+  .max(255)
+  .refine((value) => /(lawsuit|sue|lawyer)/gi.test(value), {
+    message: "Does not constitute a valid refund reason, refund denied",
+  });
+
 const RefundInputSchema = z.object({
-  originalOrderId: z.string(),
-  requestedRefundAmount: z.number(),
-  refundReason: z.string(),
-  refundType: z.enum(["store_credit"]),
+  originalOrderId: UuidSchema.optional(),
+  requestedRefundAmount: z.number().min(0),
+  refundReason: ThreateningToSueSchema,
+  refundType: z.literal("store_credit"),
 });
 
 const RefundOutputSchema = z.object({
@@ -27,7 +38,7 @@ app.post("/refund", async (c) => {
   const parsedInput = inputResult.data;
 
   // Destructuring
-  const { originalOrderId, requestedRefundAmount } = parsedInput;
+  const { originalOrderId, requestedRefundAmount, refundReason } = parsedInput;
 
   // Business logic
   const refundId = v7();
