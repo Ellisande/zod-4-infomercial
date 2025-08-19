@@ -22,20 +22,24 @@ app.post("/refund", async (c) => {
   const input = await c.req.json();
   const parsedInput = RefundInputSchema.parse(input);
 
-  // Destructuring
-  const { originalOrderId, requestedRefundAmount } = parsedInput;
-
   // Business logic
-  const refundId = v7();
-
-  const refund = await saveRefund({
-    refundId,
-    refundAmount: requestedRefundAmount,
-  });
+  const refund = await processRefund(parsedInput);
 
   // Output
   const output = RefundOutputSchema.parse(refund);
   return c.json(output);
 });
+
+const processRefund = async (
+  input: z.infer<typeof RefundInputSchema>
+): Promise<z.infer<typeof RefundOutputSchema>> => {
+  const { requestedRefundAmount } = input;
+  const refundId = v7();
+  const refund = await saveRefund({
+    refundId,
+    refundAmount: requestedRefundAmount,
+  });
+  return refund;
+};
 
 export default app;
