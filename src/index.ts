@@ -89,9 +89,7 @@ app.post("/refund", redactMiddleware(RefundOutputSchema), async (c) => {
   });
 });
 
-const processRefund = async (
-  input: z.infer<typeof RefundInputSchema>
-): Promise<z.infer<typeof RefundOutputSchema>> => {
+const processRefund = async (input: z.infer<typeof RefundInputSchema>) => {
   const { requestedRefundAmount } = input;
   const refundId = v7();
   const refund = await saveRefund({
