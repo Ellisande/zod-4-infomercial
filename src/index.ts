@@ -12,6 +12,7 @@ import {
   UuidSchema,
 } from "./schemas";
 import { mapValues } from "./utils";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 const app = new Hono();
 
@@ -55,13 +56,15 @@ const redactMiddleware = <T extends z.ZodObject>(schema: T) => {
     await next();
     const response = await c.res.json();
     if (c.res.status !== 200) {
+      console.log(response);
+      c.res = c.json(response, c.res.status as ContentfulStatusCode);
       return;
     }
     const newResponse = mapValues(response, (value, key) => {
       const transform = transformer[key];
       return transform ? transform(value) : value;
     });
-    c.res = c.json(newResponse);
+    c.res = c.json(newResponse, c.res.status);
   });
 };
 
